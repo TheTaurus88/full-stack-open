@@ -1,6 +1,23 @@
 import { useEffect, useState } from 'react'
 import jsonServer from './json-server'
 
+const Notification = ({message, color}) => {
+  let style = {
+    color: color,
+    background: 'lightgrey',
+    fontSize: 16,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  }
+  if (message) {
+    return <div style={style}> {message} </div>
+  } else {
+    return <></>
+  }
+}
+
 const Filter = ({filter, handleChangeFilter}) => {
   return (
       <div>
@@ -53,6 +70,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState('')
+  const [messageColor, setMessageColor] = useState('')
 
   const hook = () => {
     jsonServer.getAllPersons().then(response => setPersons(response.data))
@@ -72,6 +91,14 @@ const App = () => {
           setPersons(persons.map(person => person.id === exists.id ? response.data : person))
           setNewName('')
           setNewNumber('')
+          setMessage(`Modified ${newName}`)
+          setMessageColor('green')
+        }).catch(() => {
+          setPersons(persons.filter(person => person.id !== exists.id))
+          setNewName('')
+          setNewNumber('')
+          setMessage(`Cannot change ${newName}`)
+          setMessageColor('red')
         })
       }
     } else {
@@ -81,6 +108,8 @@ const App = () => {
           setPersons(persons.concat(response.data))
           setNewName('')
           setNewNumber('')
+          setMessage(`Added ${newName}`)
+          setMessageColor('green')
         })
     }
   }
@@ -99,6 +128,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} color={messageColor}/>
       <Filter filter={filter} handleChangeFilter={handleChangeFilter}/>
       <h2>Add new person</h2>
       <PersonForm 

@@ -1,8 +1,10 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 morgan.token('body', function (req, res) { 
   const body = req.body
@@ -71,9 +73,11 @@ app.get('/api/persons/:id', (request, response) => {
 app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id
   const person = persons.find(person => person.id === id)
+  console.log('id',id)
+  console.log('persons', persons)
   if (person) {
     persons = persons.filter(person => person.id !== id)
-    response.status(204).end()
+    response.send(person)
   } else {
     response.status(404).end()
   }
@@ -87,7 +91,7 @@ app.post('/api/persons', (request, response) => {
   } else if (persons.find(person => person.name === newPerson.name)) {
     return error400(response, 'Name already present')
   }
-  newPerson['id'] = Math.round(Math.random()*1000000)
+  newPerson['id'] = Math.round(Math.random()*1000000).toString()
   persons = persons.concat(newPerson)
   response.send(newPerson)
 })

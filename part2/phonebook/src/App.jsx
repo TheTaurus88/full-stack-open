@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import jsonServer from './json-server'
+import requests from './requests'
 
 const Notification = ({message, color}) => {
   let style = {
@@ -74,10 +74,10 @@ const App = () => {
   const [messageColor, setMessageColor] = useState('')
 
   const hook = () => {
-    jsonServer.getAllPersons().then(response => setPersons(response.data))
+    requests.getAllPersons().then(response => setPersons(response.data))
   }
   useEffect(hook, [])
-  console.log('render', persons)
+  // console.log('render', persons)
 
   const handleSubmitNew = (event) => {
     event.preventDefault()
@@ -86,7 +86,7 @@ const App = () => {
       // alert(`${newName} is already added to phonebook`)
       if (window.confirm('Wanna change number?')) {
         let newPerson = { ...exists, number: newNumber}
-        jsonServer.changePerson(newPerson)
+        requests.changePerson(newPerson)
         .then(response => {
           setPersons(persons.map(person => person.id === exists.id ? response.data : person))
           setNewName('')
@@ -103,7 +103,7 @@ const App = () => {
       }
     } else {
       let newPerson = { name: newName, number: newNumber }
-      jsonServer.addPerson(newPerson)
+      requests.addPerson(newPerson)
         .then(response => {
           setPersons(persons.concat(response.data))
           setNewName('')
@@ -118,7 +118,7 @@ const App = () => {
   const handleChangeFilter = (event) => { setFilter(event.target.value) }
   const handleDelete = (event) => { 
     if (window.confirm('Wanna delete?')) {
-      jsonServer.deletePerson(event.target.value)
+      requests.deletePerson(event.target.value)
         .then(response => {
           setPersons(persons.filter(person => person.id !== response.data.id))
         })

@@ -1,8 +1,11 @@
 import axios from 'axios'
 
+// const completeUrl = 'http://localhost:3001/api/persons'
+const completeUrl = '/api/persons'
+
 const getAllPersons = () => {
     return axios
-          .get('http://localhost:3001/persons')
+          .get(completeUrl)
           .then(response => {
             console.log('getAllPersons', response)
             return response
@@ -11,7 +14,7 @@ const getAllPersons = () => {
 
 const addPerson = (newPerson) => {
     return axios
-            .post('http://localhost:3001/persons', newPerson)
+            .post(completeUrl, newPerson)
             .then(response => {
             console.log('addPerson', response)
             return response
@@ -20,7 +23,7 @@ const addPerson = (newPerson) => {
 
 const deletePerson = (id) => {
     return axios
-            .delete(`http://localhost:3001/persons/${id}`)
+            .delete(`${completeUrl}/${id}`)
             .then(response => {
             console.log('deletePerson', response)
             return response
@@ -29,7 +32,7 @@ const deletePerson = (id) => {
 
 const changePerson = (person) => {
     return axios
-            .put(`http://localhost:3001/persons/${person.id}`, person)
+            .put(`${completeUrl}/${person.id}`, person)
             .then(response => {
             console.log('changePerson', response)
             return response

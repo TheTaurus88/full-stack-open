@@ -1,0 +1,13 @@
+GET http://localhost:3003/api/blogs/
+###
+DELETE http://localhost:3003/api/blogs/4
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Blog1",
+  "author": "Author1",
+  "url": "Url1",
+  "likes": "0"
+}

@@ -77,7 +77,6 @@ const App = () => {
     requests.getAllPersons().then(response => setPersons(response.data))
   }
   useEffect(hook, [])
-  // console.log('render', persons)
 
   const handleSubmitNew = (event) => {
     event.preventDefault()
@@ -110,6 +109,9 @@ const App = () => {
           setNewNumber('')
           setMessage(`Added ${newName}`)
           setMessageColor('green')
+        }).catch(error => {
+          setMessage(error.response.data.error)
+          setMessageColor('red')
         })
     }
   }

@@ -1,12 +1,14 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./mongoosePerson')
 
 const app = express()
 app.use(express.json())
 app.use(cors())
 
-morgan.token('body', function (req, res) { 
+morgan.token('body', function (req) {
   const body = req.body
   return body ? '- body ' + JSON.stringify(body) : ''
 })
@@ -16,83 +18,106 @@ const morg = morgan(function (tokens, req, res) {
     tokens.method(req, res),
     tokens.url(req, res),
     '- status', tokens.status(req, res),
-    '- content-length', tokens.res(req, res, 'content-length'), 
+    '- content-length', tokens.res(req, res, 'content-length'),
     '-', tokens['response-time'](req, res), 'ms',
     tokens['body'](req, res),
   ].join(' ')
 })
 app.use(morg)
 
-const PORT=3001
-let persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+const PORT = process.env.PORT
 
 const error400 = (response, message) => {
   return response.status(400).json({ error: message })
 }
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find().then(data => {
+    response.json(data)
+  })
 })
 app.get('/info', (request, response) => {
-  const date = new Date()
-  response.send(
-    `<p>Phonebook has ${persons.length} persons</p>
-     <p>${date}</p>`
-  )
+  Person.find().then(data => {
+    const date = new Date()
+    const numPersons = data.length
+    response.send(
+      `<p>Phonebook has ${numPersons} persons</p>
+      <p>${date}</p>`
+    )
+  })
 })
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
-  const person = persons.find(person => person.id === id)
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+  Person.findById(id).then(found => {
+    if (!found) {
+      response.status(404).end()
+    }
+    response.json(found)
+  }).catch(error => next(error))
 })
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
-  const person = persons.find(person => person.id === id)
-  console.log('id',id)
-  console.log('persons', persons)
-  if (person) {
-    persons = persons.filter(person => person.id !== id)
-    response.send(person)
-  } else {
-    response.status(404).end()
-  }
+  Person.findByIdAndDelete(id).then(deleteResp => {
+    response.status(200).send(deleteResp)
+  }).catch(error => {
+    next(error)
+  })
 })
-app.post('/api/persons', (request, response) => {
-  const newPerson = request.body
-  if (!newPerson.name) {
+app.post('/api/persons', (request, response, next) => {
+  const body = request.body
+
+  if (!body) {
+    return error400(response, 'Missing body')
+  } else if (!body.name) {
     return error400(response, 'Missing name field')
-  } else if (!newPerson.number) {
+  } else if (!body.number) {
     return error400(response, 'Missing number field')
-  } else if (persons.find(person => person.name === newPerson.name)) {
-    return error400(response, 'Name already present')
   }
-  newPerson['id'] = Math.round(Math.random()*1000000).toString()
-  persons = persons.concat(newPerson)
-  response.send(newPerson)
+
+  const newPerson = new Person({
+    'name': body.name,
+    'number': body.number,
+  })
+
+  newPerson.save().then(pers => {
+    response.json(pers)
+  }).catch(error => next(error))
 })
+app.put('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id
+  const body = request.body
+
+  if (!body) {
+    return error400(response, 'Missing body')
+  } else if (!body.name) {
+    return error400(response, 'Missing name field')
+  } else if (!body.number) {
+    return error400(response, 'Missing number field')
+  }
+
+  Person.findById(id).then(found => {
+    if (!found) {
+      response.status(404).end()
+    }
+    found.number=body.number
+    found.save().then(saveResp => {
+      response.send(saveResp)
+    })
+  }).catch(error => next(error))
+})
+
+const errorHandler = (error, request, response, next) => {
+  console.error('error message', error.message)
+
+  if (error.name === 'CastError') {
+    console.log('CastError catched')
+    return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).send({ error: error.message })
+  }
+
+  next(error)
+}
+app.use(errorHandler)
+
 app.listen(PORT, () => {console.log('listen port', PORT)})

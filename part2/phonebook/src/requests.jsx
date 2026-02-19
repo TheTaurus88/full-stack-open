@@ -18,7 +18,7 @@ const addPerson = (newPerson) => {
             .then(response => {
             console.log('addPerson', response)
             return response
-        })
+            })
 }
 
 const deletePerson = (id) => {

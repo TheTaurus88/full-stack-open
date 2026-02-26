@@ -6,6 +6,7 @@ import Login from './components/Login'
 import loginService from './services/login'
 import NewBlog from './components/NewBlog'
 import Logout from './components/Logout'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -15,6 +16,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [message, setMessage] = useState('')
+  const [color, setColor] = useState('')
 
   const getBlogsHook = () => {
     const getAll = async () => {
@@ -46,7 +49,11 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch {
-      console.log('wrong credentials')
+      setMessage('Login failed, wrong credentials')
+      setColor('red')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     }
   }
 
@@ -58,15 +65,29 @@ const App = () => {
 
   const handleSubmitBlog = async (event) => {
     event.preventDefault()
-    const newBlog = await blogService.create({'title': title, 'author': author, 'url': url})
-    setTitle('')
-    setAuthor('')
-    setUrl('')
-    setBlogs(blogs.concat(newBlog))
+    try {
+      const newBlog = await blogService.create({'title': title, 'author': author, 'url': url})
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      setBlogs(blogs.concat(newBlog))
+      setMessage(`Blog created - ${title} by ${author}`)
+      setColor('green')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    } catch {
+      setMessage('Error in blog creation')
+      setColor('red')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
   }
 
   return (
     <div>
+      <Notification message={message} color={color}/>
       {user ? 
       <div>
         <Logout name={user.name} handleLogout={handleLogout}/>

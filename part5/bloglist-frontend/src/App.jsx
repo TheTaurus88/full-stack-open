@@ -14,9 +14,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [message, setMessage] = useState('')
   const [color, setColor] = useState('')
   const newBlogRef = useRef()
@@ -65,16 +62,12 @@ const App = () => {
     setUser(null)
   }
 
-  const handleSubmitBlog = async (event) => {
-    event.preventDefault()
+  const handleSubmitBlog = async (blog) => {
     try {
-      const newBlog = await blogService.create({'title': title, 'author': author, 'url': url})
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      const newBlog = await blogService.create(blog)
       setBlogs(blogs.concat(newBlog))
       newBlogRef.current.toggleVisibility()
-      setMessage(`Blog created - ${title} by ${author}`)
+      setMessage(`Blog created - ${newBlog.title} by ${newBlog.author}`)
       setColor('green')
       setTimeout(() => {
         setMessage(null)
@@ -95,14 +88,7 @@ const App = () => {
       <div>
         <Logout name={user.name} handleLogout={handleLogout}/>
         <Togglable showButtonLabel='create new blog' ref={newBlogRef}>
-          <NewBlog 
-            title={title} 
-            setTitle={setTitle} 
-            author={author} 
-            setAuthor={setAuthor} 
-            url={url}
-            setUrl={setUrl}
-            handleSubmitBlog={handleSubmitBlog}/>
+          <NewBlog handleSubmitBlog={handleSubmitBlog}/>
         </Togglable>
         <Blogs 
           blogs={blogs}/> 

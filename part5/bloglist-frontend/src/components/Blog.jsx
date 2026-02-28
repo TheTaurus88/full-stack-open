@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleAddLike }) => {
   const [ isDetailMode, setIsDetailMode ] = useState(false)
   const blogStyle = {
     paddingTop: 10,
@@ -9,7 +9,8 @@ const Blog = ({ blog }) => {
     borderWidth: 1,
     marginBottom: 5
   }
-  const hideView = () => setIsDetailMode(!isDetailMode)
+  const hideView = () => { setIsDetailMode(!isDetailMode) }
+  const addLike = async () => { await handleAddLike(blog) }
   
   return (
   <div style={blogStyle}>
@@ -20,7 +21,7 @@ const Blog = ({ blog }) => {
         <p>{blog.url}</p>
         <p>
           likes {blog.likes}
-          <button>like</button>
+          <button onClick={addLike}>like</button>
         </p>
         <button onClick={hideView}> hide</button>
       </div>

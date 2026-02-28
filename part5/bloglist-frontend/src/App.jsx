@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
 import blogService from './services/blogs'
 import Blogs from './components/Blogs'
 import Login from './components/Login'
@@ -81,6 +80,19 @@ const App = () => {
     }
   }
 
+  const handleAddLike = async (blog) => {
+    try {
+      const newBlog = await blogService.addLike(blog)
+      setBlogs(blogs.map(origBlog => origBlog.id === blog.id ? newBlog : origBlog))
+    } catch {
+      setMessage('Error adding like')
+      setColor('red')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
+  }
+
   return (
     <div>
       <Notification message={message} color={color}/>
@@ -91,7 +103,7 @@ const App = () => {
           <NewBlog handleSubmitBlog={handleSubmitBlog}/>
         </Togglable>
         <Blogs 
-          blogs={blogs}/> 
+          blogs={blogs} handleAddLike={handleAddLike}/> 
       </div>
       : 
       <Login 

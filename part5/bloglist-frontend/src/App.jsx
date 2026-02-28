@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import Blogs from './components/Blogs'
@@ -7,6 +7,7 @@ import loginService from './services/login'
 import NewBlog from './components/NewBlog'
 import Logout from './components/Logout'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -18,6 +19,7 @@ const App = () => {
   const [url, setUrl] = useState('')
   const [message, setMessage] = useState('')
   const [color, setColor] = useState('')
+  const newBlogRef = useRef()
 
   const getBlogsHook = () => {
     const getAll = async () => {
@@ -71,6 +73,7 @@ const App = () => {
       setAuthor('')
       setUrl('')
       setBlogs(blogs.concat(newBlog))
+      newBlogRef.current.toggleVisibility()
       setMessage(`Blog created - ${title} by ${author}`)
       setColor('green')
       setTimeout(() => {
@@ -91,14 +94,16 @@ const App = () => {
       {user ? 
       <div>
         <Logout name={user.name} handleLogout={handleLogout}/>
-        <NewBlog 
-          title={title} 
-          setTitle={setTitle} 
-          author={author} 
-          setAuthor={setAuthor} 
-          url={url}
-          setUrl={setUrl}
-          handleSubmitBlog={handleSubmitBlog}/>
+        <Togglable showButtonLabel='create new blog' ref={newBlogRef}>
+          <NewBlog 
+            title={title} 
+            setTitle={setTitle} 
+            author={author} 
+            setAuthor={setAuthor} 
+            url={url}
+            setUrl={setUrl}
+            handleSubmitBlog={handleSubmitBlog}/>
+        </Togglable>
         <Blogs 
           blogs={blogs}/> 
       </div>

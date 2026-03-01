@@ -20,7 +20,8 @@ const App = () => {
   const getBlogsHook = () => {
     const getAll = async () => {
       const blogs = await blogService.getAll()
-      setBlogs(blogs)
+      const sortedBlogs = sortBlogs(blogs)
+      setBlogs(sortedBlogs)
     }
     getAll()
   }
@@ -64,7 +65,9 @@ const App = () => {
   const handleSubmitBlog = async (blog) => {
     try {
       const newBlog = await blogService.create(blog)
-      setBlogs(blogs.concat(newBlog))
+      const updatedBlogs = blogs.concat(newBlog)
+      const sortedBlogs = sortBlogs(updatedBlogs)
+      setBlogs(sortedBlogs)
       newBlogRef.current.toggleVisibility()
       setMessage(`Blog created - ${newBlog.title} by ${newBlog.author}`)
       setColor('green')
@@ -83,7 +86,9 @@ const App = () => {
   const handleAddLike = async (blog) => {
     try {
       const newBlog = await blogService.addLike(blog)
-      setBlogs(blogs.map(origBlog => origBlog.id === blog.id ? newBlog : origBlog))
+      const replacedBlogs = blogs.map(origBlog => origBlog.id === blog.id ? newBlog : origBlog)
+      const sortedBlogs = sortBlogs(replacedBlogs)
+      setBlogs(sortedBlogs)
     } catch {
       setMessage('Error adding like')
       setColor('red')
@@ -91,6 +96,10 @@ const App = () => {
         setMessage(null)
       }, 5000)
     }
+  }
+
+  const sortBlogs = (blogs) => {
+    return blogs.sort((blog1, blog2) => blog2.likes - blog1.likes)
   }
 
   return (

@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({ blog, handleAddLike }) => {
+const Blog = ({ blog, handleAddLike, user, handleDeleteBlog }) => {
   const [ isDetailMode, setIsDetailMode ] = useState(false)
   const blogStyle = {
     paddingTop: 10,
@@ -11,7 +11,13 @@ const Blog = ({ blog, handleAddLike }) => {
   }
   const hideView = () => { setIsDetailMode(!isDetailMode) }
   const addLike = async () => { await handleAddLike(blog) }
-  
+  const removeBlog = async () => { 
+    if (window.confirm('Remove blog?')) {
+      await handleDeleteBlog(blog)
+    }
+  }
+  const blogUserIsLoggedUser = blog?.user?.username === user?.username
+
   return (
   <div style={blogStyle}>
     {isDetailMode ? 
@@ -25,6 +31,12 @@ const Blog = ({ blog, handleAddLike }) => {
           <button onClick={addLike}>like</button>
         </p>
         <button onClick={hideView}> hide</button>
+        <div>
+          {blogUserIsLoggedUser ?
+            <button onClick={removeBlog}> remove</button>
+            : <></>
+          }
+        </div>
       </div>
       :
       <div>

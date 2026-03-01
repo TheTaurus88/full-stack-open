@@ -98,6 +98,21 @@ const App = () => {
     }
   }
 
+  const handleDeleteBlog = async (blog) => {
+    try {
+      const resp = await blogService.deleteBlog(blog)
+      const replacedBlogs = blogs.filter(origBlog => origBlog.id !== blog.id)
+      const sortedBlogs = sortBlogs(replacedBlogs)
+      setBlogs(sortedBlogs)
+    } catch {
+      setMessage('Error deleting blog')
+      setColor('red')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
+  }
+
   const sortBlogs = (blogs) => {
     return blogs.sort((blog1, blog2) => blog2.likes - blog1.likes)
   }
@@ -112,7 +127,10 @@ const App = () => {
           <NewBlog handleSubmitBlog={handleSubmitBlog}/>
         </Togglable>
         <Blogs 
-          blogs={blogs} handleAddLike={handleAddLike}/> 
+          blogs={blogs} 
+          handleAddLike={handleAddLike} 
+          user={user}
+          handleDeleteBlog={handleDeleteBlog}/> 
       </div>
       : 
       <Login 

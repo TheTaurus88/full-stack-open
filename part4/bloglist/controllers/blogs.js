@@ -1,7 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+// const User = require('../models/user')
+// const jwt = require('jsonwebtoken')
 const { userExtractor } = require('../utils/middleware')
 
 // const getTokenFrom = request => {
@@ -35,6 +35,7 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
 
   const blog = new Blog(body)
   const insertBlog = await blog.save()
+  await insertBlog.populate('user', { username: 1, name: 1 })
 
   user.blogs = user.blogs.concat(blog._id)
   await user.save()

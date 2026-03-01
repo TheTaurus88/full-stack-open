@@ -19,6 +19,7 @@ const Blog = ({ blog, handleAddLike }) => {
         <p>{blog.title}</p>
         <p>{blog.author}</p>
         <p>{blog.url}</p>
+        <p>{blog?.user?.username}</p>
         <p>
           likes {blog.likes}
           <button onClick={addLike}>like</button>

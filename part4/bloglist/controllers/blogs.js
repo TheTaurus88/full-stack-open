@@ -70,6 +70,7 @@ blogsRouter.put('/:id', async (request, response) => {
     // blog.url = body.url
     blog.likes = body.likes
     const insertBlog = await blog.save()
+    await insertBlog.populate('user', { username: 1, name: 1 })
     response.json(insertBlog)
   } else {
     return response.status(404).end()

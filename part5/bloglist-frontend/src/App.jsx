@@ -41,7 +41,7 @@ const App = () => {
   const handleSubmitLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({ username, password})
+      const user = await loginService.login({ username, password })
       setUser(user)
       blogService.setToken(user.token)
       window.localStorage.setItem('user', JSON.stringify(user))
@@ -100,7 +100,7 @@ const App = () => {
 
   const handleDeleteBlog = async (blog) => {
     try {
-      const resp = await blogService.deleteBlog(blog)
+      await blogService.deleteBlog(blog)
       const replacedBlogs = blogs.filter(origBlog => origBlog.id !== blog.id)
       const sortedBlogs = sortBlogs(replacedBlogs)
       setBlogs(sortedBlogs)
@@ -120,25 +120,25 @@ const App = () => {
   return (
     <div>
       <Notification message={message} color={color}/>
-      {user ? 
-      <div>
-        <Logout name={user.name} handleLogout={handleLogout}/>
-        <Togglable showButtonLabel='create new blog' ref={newBlogRef}>
-          <NewBlog handleSubmitBlog={handleSubmitBlog}/>
-        </Togglable>
-        <Blogs 
-          blogs={blogs} 
-          handleAddLike={handleAddLike} 
-          user={user}
-          handleDeleteBlog={handleDeleteBlog}/> 
-      </div>
-      : 
-      <Login 
-        username={username} 
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-        handleSubmitLogin={handleSubmitLogin}/>
+      {user ?
+        <div>
+          <Logout name={user.name} handleLogout={handleLogout}/>
+          <Togglable showButtonLabel='create new blog' ref={newBlogRef}>
+            <NewBlog handleSubmitBlog={handleSubmitBlog}/>
+          </Togglable>
+          <Blogs
+            blogs={blogs}
+            handleAddLike={handleAddLike}
+            user={user}
+            handleDeleteBlog={handleDeleteBlog}/>
+        </div>
+        :
+        <Login
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+          handleSubmitLogin={handleSubmitLogin}/>
       }
     </div>
   )

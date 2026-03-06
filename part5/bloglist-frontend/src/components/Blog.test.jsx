@@ -14,17 +14,17 @@ test('detail off: renders title/author but not url/likes', () => {
   render(<Blog blog={blog} />)
 
   // Exact string found
-  expect(screen.getByText('blog title blog author')).toBeInTheDocument()
+  expect(screen.getByText(`${blog.title} ${blog.author}`)).toBeInTheDocument()
 
   // Regex (string contained in html) found
-  expect(screen.queryByText(/blog title/)).toBeInTheDocument()
-  expect(screen.queryByText(/blog author/)).toBeInTheDocument()
+  expect(screen.queryByText(new RegExp(blog.title))).toBeInTheDocument()
+  expect(screen.queryByText(new RegExp(blog.author))).toBeInTheDocument()
 
   // Exact string not found
   expect(screen.queryByText('blog')).not.toBeInTheDocument()
 
   // Regex not found
-  expect(screen.queryByText(/url/)).not.toBeInTheDocument()
+  expect(screen.queryByText(new RegExp(blog.url))).not.toBeInTheDocument()
   expect(screen.queryByText(/likes/)).not.toBeInTheDocument()
 })
 
@@ -35,9 +35,9 @@ test('detail on: renders title/author/url/likes', async () => {
   const button = screen.getByText('view')
   await user.click(button)
 
-  expect(screen.queryByText(/blog title/)).toBeInTheDocument()
-  expect(screen.queryByText(/blog author/)).toBeInTheDocument()
-  expect(screen.queryByText(/blog url/)).toBeInTheDocument()
+  expect(screen.queryByText(new RegExp(blog.title))).toBeInTheDocument()
+  expect(screen.queryByText(new RegExp(blog.author))).toBeInTheDocument()
+  expect(screen.queryByText(new RegExp(blog.url))).toBeInTheDocument()
   expect(screen.queryByText(/likes 0/)).toBeInTheDocument()
 })
 

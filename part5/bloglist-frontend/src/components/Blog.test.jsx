@@ -34,9 +34,23 @@ test('detail on: renders title/author/url/likes', async () => {
   const user = userEvent.setup()
   const button = screen.getByText('view')
   await user.click(button)
-  screen.debug()
+
   expect(screen.queryByText(/blog title/)).toBeInTheDocument()
   expect(screen.queryByText(/blog author/)).toBeInTheDocument()
   expect(screen.queryByText(/blog url/)).toBeInTheDocument()
   expect(screen.queryByText(/likes 0/)).toBeInTheDocument()
+})
+
+test('like button press', async () => {
+  const mockHandler = vi.fn()
+
+  render(<Blog blog={blog} handleAddLike={mockHandler} />)
+  const user = userEvent.setup()
+  const viewButton = screen.getByText('view')
+  await user.click(viewButton)
+  const likeButton = screen.getByText('like')
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
 })

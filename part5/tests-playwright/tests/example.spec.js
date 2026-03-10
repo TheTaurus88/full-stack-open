@@ -1,7 +1,7 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
 
-async function login(page, pwd) {
-  await page.getByRole('textbox', { name: 'username' }).fill('testUser')
+async function login(page, user, pwd) {
+  await page.getByRole('textbox', { name: 'username' }).fill(user || 'testUser')
   await page.getByRole('textbox', { name: 'password' }).fill(pwd || 'testPwd')
   await page.getByRole('button', { name: 'login' }).click()
 }
@@ -19,9 +19,12 @@ describe('Blog app', () => {
     await request.post('http://localhost:3003/api/testing/reset')
     await request.post('http://localhost:3003/api/users', {
       data: {
-        name: 'Marco',
-        username: 'testUser',
-        password: 'testPwd'
+        name: 'Marco', username: 'testUser', password: 'testPwd'
+      }
+    })
+    await request.post('http://localhost:3003/api/users', {
+      data: {
+        name: 'Marco2', username: 'testUser2', password: 'testPwd2'
       }
     })
     await page.goto('http://localhost:5173')
@@ -74,6 +77,20 @@ describe('Blog app', () => {
       page.on('dialog', dialog => dialog.accept());
       await page.getByRole('button', { name: 'remove' }).click()
       await expect(page.getByText('testtitle testauthor view')).not.toBeVisible()
+    })
+  })
+
+  describe('Different user cannot delete', () => {
+    beforeEach(async ({ page }) => {
+      await login(page)
+      await createBlog(page)
+      await page.getByRole('button', { name: 'logout' }).click()
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await login(page, 'testUser2', 'testPwd2')
+      await page.getByRole('button', { name: 'view' }).click()
+      await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
     })
   })
 })

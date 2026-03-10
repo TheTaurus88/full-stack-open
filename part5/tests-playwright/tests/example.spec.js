@@ -1,5 +1,11 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
 
+async function login(page, pwd) {
+  await page.getByRole('textbox', { name: 'username' }).fill('testUser')
+  await page.getByRole('textbox', { name: 'password' }).fill(pwd || 'testPwd')
+  await page.getByRole('button', { name: 'login' }).click()
+}
+
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3003/api/testing/reset')
@@ -20,19 +26,32 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await page.getByRole('textbox', { name: 'username' }).fill('testUser');
-      await page.getByRole('textbox', { name: 'password' }).fill('testPwd');
-      await page.getByRole('button', { name: 'login' }).click()
+      await login(page)
       const welcomeMessage = page.getByRole('heading', { name: 'Welcome Marco' })
       await expect(welcomeMessage).toBeVisible();
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await page.getByRole('textbox', { name: 'username' }).fill('1');
-      await page.getByRole('textbox', { name: 'password' }).fill('2');
-      await page.getByRole('button', { name: 'login' }).click()
-      const welcomeMessage = page.getByRole('heading', { name: 'Welcome Marco' })
-      await expect(welcomeMessage).not.toBeVisible();
+      await login(page, "wrong")
+      const wrongText = page.getByText('Login failed, wrong')
+      await wrongText.waitFor()
+      await expect(wrongText).toBeVisible()
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await login(page)
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'create new blog' }).click()
+      await page.getByLabel('title').fill('testtitle')
+      await page.getByLabel('author').fill('testauthor')
+      await page.getByLabel('url').fill('testurl')
+      await page.getByRole('button', { name: 'create' }).click()
+      await page.getByText('testtitle testauthor view').waitFor()
+      await expect(page.getByText('testtitle testauthor view')).toBeVisible()
     })
   })
 })

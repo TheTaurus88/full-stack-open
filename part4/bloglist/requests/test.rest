@@ -6,7 +6,7 @@ DELETE http://localhost:3003/api/blogs/4
 ###
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY5OWRjZTgyNGU4NzY3MGVkNzBkZjBjYSIsImlhdCI6MTc3MTk0OTk2MX0.kE9bJPkWKC8MgKC16P-Q6mpgsjhx9tJHSE4o46vlESU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY5YWYwNTVmOGFiMTZjYmI1MzVmMjI4ZiIsImlhdCI6MTc3MzA3Nzg3MH0.OWjkT5jSMBZyRXFXQfQGPXHny7M2rKD1xrzcperev8M
 
 {
   "title": "Blog1",
@@ -20,5 +20,14 @@ Content-Type: application/json
 
 {
   "username": "root",
+  "password": "sekret"
+}
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "root",
+  "name": "root",
   "password": "sekret"
 }
